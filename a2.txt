@@ -1,82 +1,67 @@
 Script started on 2021-10-02 08:26:05+00:00 [TERM="xterm" TTY="/dev/pts/0" COLUMNS="161" LINES="23"]
+
+/// QUESTION 1: Unique customer ids, product ids and titles
+/// These 3 commands take the relevant field columns, and count unique values of each field.
+/// We can see from the first value of each output the results:
+/// 1502381 unique customer ids
+/// 779734 unique product ids
+/// 713712 unique product titles
+/// Interestingly there are more ids than titles for products, meaning some products are the same item, sold different ways
+
 ]0;keskin@f6linux6: ~keskin@f6linux6:~$ cut -f 2 amazon_reviews_us_Books_v1_02.tsv | sort -n | uniq | wc
 1502381 1502381 13521432
 ]0;keskin@f6linux6: ~keskin@f6linux6:~$ cut -f 4 amazon_reviews_us_Books_v1_02.tsv | sort -n | uniq | wc
  779734  779734 8577074
 ]0;keskin@f6linux6: ~keskin@f6linux6:~$ cut -f 6 amazon_reviews_us_Books_v1_02.tsv | sort -n | uniq | wc
  713712 5374199 35188981
+
+/// QUESTION 2: Selecting 100 customers with multiple reviews
+/// For getting 100 ID's and ensuring that they have multiple reviews
+/// These piped commands choose the top 100 most reviewing customers ID's
+/// First, the ID's are placed into a file called 'customerIDs.txt'
+/// This cuts only the ID's column, and uses sort and uniq with count flag '-c' to get the numbers of reviews
+/// Then these numbers are sorted, and used to get the 100 top ID's
+/// Next this file is used to create a new file as ID number '.txt'
+/// And the review and helpfulness scores from fields 8 and 9 are cut into these files
+
 ]0;keskin@f6linux6: ~keskin@f6linux6:~$ touch customerIDs.txt
 ]0;keskin@f6linux6: ~keskin@f6linux6:~$ cut -f 2 amazon_reviews_us_Books_v1_02.tsv | sort -n | uniq -c | sort -nr | awk '{print $2}' | head -n 100 > customerIDs.txt
-]0;keskin@f6linux6: ~keskin@f6linux6:~$ input="customerIDs.txt"; while read -r line; do echo $line; awk -v "ID=$line" '$2 == ID' amazon_reviews_us_Books_v1_02.tsv | cut -f 8,9 > "CUSTOMERS/$line.txt"; done < "$input"
-50122160
-bash: CUSTOMERS/50122160.txt: No such file or directory
-50732546
-bash: CUSTOMERS/50732546.txt: No such file or directory
-52615377
-bash: CUSTOMERS/52615377.txt: No such file or directory
-45041039
-bash: CUSTOMERS/45041039.txt: No such file or directory
-50776149
-bash: CUSTOMERS/50776149.txt: No such file or directory
-50913245
-bash: CUSTOMERS/50913245.txt: No such file or directory
-20595117
-bash: CUSTOMERS/20595117.txt: No such file or directory
-45273033
-bash: CUSTOMERS/45273033.txt: No such file or directory
-39569598
-bash: CUSTOMERS/39569598.txt: No such file or directory
-49693975
-bash: CUSTOMERS/49693975.txt: No such file or directory
-38491967
-bash: CUSTOMERS/38491967.txt: No such file or directory
-36642996
-bash: CUSTOMERS/36642996.txt: No such file or directory
-50881246
-bash: CUSTOMERS/50881246.txt: No such file or directory
-52254603
-bash: CUSTOMERS/52254603.txt: No such file or directory
-51987970
-bash: CUSTOMERS/51987970.txt: No such file or directory
-49750558
-bash: CUSTOMERS/49750558.txt: No such file or directory
-49115690
-bash: CUSTOMERS/49115690.txt: No such file or directory
-50608834
-bash: CUSTOMERS/50608834.txt: No such file or directory
-50068216
-bash: CUSTOMERS/50068216.txt: No such file or directory
-51147790
-bash: CUSTOMERS/51147790.txt: No such file or directory
-43546353
-bash: CUSTOMERS/43546353.txt: No such file or directory
-50199793
-bash: CUSTOMERS/50199793.txt: No such file or directory
-52476938
-bash: CUSTOMERS/52476938.txt: No such file or directory
-50774468
-bash: CUSTOMERS/50774468.txt: No such file or directory
-49273674
-bash: CUSTOMERS/49273674.txt: No such file or directory
-49148452
-bash: CUSTOMERS/49148452.txt: No such file or directory
-41012519
-bash: CUSTOMERS/41012519.txt: No such file or directory
-52938698
-bash: CUSTOMERS/52938698.txt: No such file or directory
-^C
+/// NOTE: An incorrect attempt that used echo's of ID's was cut here, to lower spam on the file you are reading
 ]0;keskin@f6linux6: ~keskin@f6linux6:~$ mkdir CUSTOMERS
 ]0;keskin@f6linux6: ~keskin@f6linux6:~$ mkdir PRODCU[K[KUCTS
-]0;keskin@f6linux6: ~keskin@f6linux6:~$ input="customerIDs.txt"; while read -r line; do echo $line; awk -v "ID=$line" '$2 == ID' amazon_reviews_us_Books_v1_02.tsv | cut -f 8,9 > "CUSTOMERS/$line.txt"; done < "$input"
-50122160
-50732546
-^C
+/// NOTE: Another echo using command with spam was cut here
 ]0;keskin@f6linux6: ~keskin@f6linux6:~$ input="customerIDs.txt"; while read -r line; do awk -v "ID=$line" '$2 == ID' amazon_reviews_us_Books_v1_02.tsv | cut -f 8,9 > "CUSTOMERS/$line.txt"; done < "$input"
+
+/// QUESTION 3: Selecting 100 product ID's that have multiple reviews
+/// The same process for question 2 was used, but with selections for field 4; the product ID column
+/// The file used in this case was 'productIDs.txt'
+
 ]0;keskin@f6linux6: ~keskin@f6linux6:~$ touch productIDs.txt
 ]0;keskin@f6linux6: ~keskin@f6linux6:~$ cut -f 4 amazon_reviews_us_Books_v1_02.tsv | sort -n | uniq -c | sort -nr | awk '{print $2}'| head -n 100 > productIDs.txt
 ]0;keskin@f6linux6: ~keskin@f6linux6:~$ input="productIDs.txt"; while read -r line; do awk -v "ID=$line" '$4 == ID' amazon_reviews_us_Books_v1_02.tsv | cut -f 8,9 > "PRODUCTS/$line.txt"; done < "$input"
+
+/// QUESTION 4: Alias command 'l'
+/// This question requires creating a customized alias command
+/// The command is "l", and its a shortcut for a larger command "ls -latr"
+/// It's a one line answer
+
 ]0;keskin@f6linux6: ~keskin@f6linux6:~$ alias l="ls -latr"
+
+/// QUESTION 5: Alias command 'w'
+/// This is similar to question 4, and this command gets the count of files in a directory
+/// The command is "w", and its a shortcut for a larger command "ls -la | wc"
+/// It's a one line answer
+
 ]0;keskin@f6linux6: ~keskin@f6linux6:~$ alias w="ls -la | wc"
+
+/// QUESTION 6: Placing alias commands in .bashrc file
+/// .bashrc is a file that holds permanent aliases
+/// We can place the single line commands used into this file
+/// and they will be executed when a console session starts, so the aliases are always available
+
+/// NOTE: I had already placed the aliases before scripting these commands
+/// but the output below does show that they are already in .bashrc
+
 ]0;keskin@f6linux6: ~keskin@f6linux6:~$ vim ~/.bashrc
 [?1049h[22;0;0t[>4;2m[?1h=[?2004h[1;23r[?12h[?12l[22;2t[22;1t[27m[23m[29m[m[H[2J[?25l[23;1H"~/.bashrc" 117L, 3792C[2;1H▽[6n[2;1H  [1;1H[>c]10;?]11;?[1;5H[33malias [m[36mfgrep[m[33m='[m[31mfgrep --color=auto[m[33m'
 [m    [33malias [m[36megrep[m[33m='[m[31megrep --color=auto[m[33m'
@@ -88,6 +73,9 @@ fi[m
 # some more ls aliases[m
 [33malias [m[36mll[m[33m='[m[31mls -alF[m[33m'
 alias [m[36mla[m[33m='[m[31mls -A[m[33m'
+
+/// THE INSERTED ALIASES ARE HERE
+
 alias[m [36mw[m=[33m'[m[31mls -la|wc[m[33m'
 alias[m [36ml[m=[33m'[m[31mls -latr[m[33m'[m
 [34m# Add an "alert" alias for long running commands.  Use like so:
@@ -97,7 +85,18 @@ alias[m [36ml[m=[33m'[m[31mls -latr[m[33m'[m
 [34m# Alias definitions.
 # You may want to put all your additions into a separate file like
 # ~/.bash_aliases, instead of adding them here directly.
-# See /usr/share/doc/bash-doc/examples in the bash-doc package.[m[23;144H93,19[9C85%[11;19H[?25h[?25l[23;134H:[11;19H[23;1H[K[23;1H:[?2004h[?25hx[?25l[?2004l[23;2t[23;1t[23;1H[K[23;1H[?2004l[?1l>[?25h[>4;m[?1049l[23;0;0t]0;keskin@f6linux6: ~keskin@f6linux6:~$ cd CUSTOMERsS[K[KS
+# See /usr/share/doc/bash-doc/examples in the bash-doc package.[m[23;144H93,19[9C85%[11;19H[?25h[?25l[23;134H:[11;19H[23;1H[K[23;1H:[?2004h[?25hx
+[?25l[?2004l[23;2t[23;1t[23;1H[K[23;1H[?2004l[?1l>[?25h[>4;m[?1049l[23;0;0t]0;
+keskin@f6linux6: ~
+
+/// QUESTION 7: Verifying customer ID file counts
+/// We can use the alias command "w" from question 5 to answer this question
+/// Going into both CUSTOMERS and PRODUCTS directories and using the "w"
+/// Shows both directories have 103 files
+/// 100 of those is the generated 
+/// The other 3 are utility files used by the Linux OS
+
+keskin@f6linux6:~$ cd CUSTOMERsS[K[KS
 ]0;keskin@f6linux6: ~/CUSTOMERSkeskin@f6linux6:~/CUSTOMERS$ w
     103     920    6109
 ]0;keskin@f6linux6: ~/CUSTOMERSkeskin@f6linux6:~/CUSTOMERS$ cd
@@ -105,213 +104,25 @@ alias[m [36ml[m=[33m'[m[31mls -latr[m[33m'[m
 ]0;keskin@f6linux6: ~/PRODUCTSkeskin@f6linux6:~/PRODUCTS$ w
     103     920    6309
 ]0;keskin@f6linux6: ~/PRODUCTSkeskin@f6linux6:~/PRODUCTS$ cd
+
+/// QUESTION 8: Correlation scores of reviews and helpfulness per customer
+/// NOTE: Datamash was already installed before scripting, the installation was messy so its cleaner without the spam
+/// We can use datamash commands ppearson option to find correlation between two given fields
+/// This is perfect for finding review and helpfulness correlation ratios for all customers
+/// I also test this functionality by making a "c.txt" file, filled with two columns of all equal values
+/// The result from that should be 1, and is 1
+/// The customer scores are shown below, a few have "nan" scores but most have a real number value
+
 ]0;keskin@f6linux6: ~keskin@f6linux6:~$ for i in {1..1000} ; do echo $i $i ;done >> c.txt
 ]0;keskin@f6linux6: ~keskin@f6linux6:~$ datamash-1.3/datamash  -W ppearson 1:2 < c.txt
 1
+
+//NOTE: These are failed attempts with incorrect directories for datamash and CUSTOMERS files
 ]0;keskin@f6linux6: ~keskin@f6linux6:~$ for FILE in ../CUSTOMERS/*; do echo "$FILE"; ./datamash  -W ppearson 1:2 <  "$FILE" ; done
 ../CUSTOMERS/*
 bash: ../CUSTOMERS/*: No such file or directory
 ]0;keskin@f6linux6: ~keskin@f6linux6:~$ for FILE in CUSTOMERS/*; do echo "$FILE"; ./datamash  -W ppearson 1:2 <  "$FILE" ; done
-CUSTOMERS/20595117.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/30559999.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/35004134.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/35985708.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/36642996.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/38491967.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/38672733.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/39134375.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/39569598.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/41012519.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/42800127.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/43546353.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/45041039.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/45193257.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/45273033.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/45284807.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/46134316.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/46983871.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/49042814.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/49115690.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/49148452.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/49202417.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/49273674.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/49355567.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/49447323.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/49693975.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/49750558.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/49786731.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/49992211.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/50057481.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/50068216.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/50122160.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/50199793.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/50378566.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/50389232.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/50592435.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/50608834.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/50652563.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/50702879.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/50732546.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/50736950.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/50761804.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/50774468.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/50776149.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/50881246.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/50895620.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/50913245.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/50941451.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/51010391.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/51065232.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/51110953.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/51142763.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/51145127.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/51147790.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/51199159.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/51210331.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/51243012.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/51247650.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/51325095.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/51379338.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/51809405.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/51915884.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/51917998.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/51934027.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/51987970.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/52008531.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/52012289.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/52173832.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/52223435.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/52254603.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/52266433.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/52447634.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/52476938.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/52496677.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/52500542.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/52517734.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/52564468.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/52615377.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/52697458.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/52706646.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/52753467.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/52774618.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/52793250.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/52797744.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/52830980.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/52845727.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/52894384.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/52938698.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/52947077.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/52966385.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/53008075.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/53009736.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/53016962.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/53037408.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/53047425.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/53052943.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/53071109.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/53072811.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/53082946.txt
-bash: ./datamash: No such file or directory
-CUSTOMERS/53084107.txt
-bash: ./datamash: No such file or directory
+/// REMOVED 100 COMPLAINTS OF "file not found"
 ]0;keskin@f6linux6: ~keskin@f6linux6:~$ for FILE in CUSTOMERS/*; do echo "$FILE"; datamash-1.3/datamash  -W ppearson 1:2 <  "$FILE" ; done
 CUSTOMERS/20595117.txt
 -0.07801434074194
@@ -513,6 +324,17 @@ CUSTOMERS/53082946.txt
 0.098723957624567
 CUSTOMERS/53084107.txt
 0.059862926995826
+
+/// QUESTION 9: Average helpfulness scores of per customer, and min and max
+/// We can use datamash again, but with the "mean" option to find the mean average of helpfulness scores
+/// Specifying column 2 from the files gives helpfulness, and the resulting averages are shown below
+/// The lowest average is on lines 376 and 377. 
+/// Customer 49202417 with an average of 2.6730506155951 helpfulness scores
+/// People just dont like 49202417
+/// On the other hand, the highest average is on lines 350 and 351.
+/// Customer 38672733 with an average of 57.232 helpfulness scores
+/// No one else is even close to 38672733. They're just such a helpful guy you know
+
 ]0;keskin@f6linux6: ~keskin@f6linux6:~$ for FILE in CUSTOMERS/*; do echo "$FILE";  datamash-1.3/datamash mean 2 < "$FILE" ; done
 CUSTOMERS/20595117.txt
 7.1284236153378
@@ -714,6 +536,18 @@ CUSTOMERS/53082946.txt
 19.401534526854
 CUSTOMERS/53084107.txt
 15.277410832232
+
+/// QUESTION 10: Average review scores of per product, and min and max
+/// Similar to the calculations for question 9, we can find average review scores for products
+/// This score is in a smaller range, since all reviews scores are between 1 and 5
+/// Still we can see all average review scores below
+/// The lowest reviewed product is on lines 594 and 595.
+/// Product 0312864590 has an average review score of 1.6867945823928
+/// Just avoid this product at all costs really
+/// The highest reviewd product is on lines 648 and 649
+/// Product 0439136350 has an amazing average review score of 4.8400868306802
+/// This is near a perfect score of 5, which is really good considering that these are the highest reviewed products
+
 ]0;keskin@f6linux6: ~keskin@f6linux6:~$ for FILE in PRODUCTS/*; do echo "$FILE";  datamash-1.3/datamash mean 1 < "$FILE"; done
 PRODUCTS/0060193395.txt
 4.2006033182504
